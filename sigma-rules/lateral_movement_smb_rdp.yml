@@ -1,0 +1,36 @@
+title: Suspicious Lateral Movement via SMB or RDP
+id: 5d2c9f8a-1a3e-4c77-9b3f-2c1d8e9a7f55
+status: experimental
+description: Detects potential lateral movement activity using SMB or RDP connections between hosts.
+author: Stacey Menley
+
+logsource:
+  product: windows
+  category: network_connection
+
+detection:
+  selection_rdp:
+    DestinationPort: 3389
+
+  selection_smb:
+    DestinationPort: 445
+
+  selection_process:
+    Image|contains:
+      - "powershell.exe"
+      - "wmic.exe"
+      - "psexec.exe"
+
+  condition: (selection_rdp or selection_smb) and selection_process
+
+falsepositives:
+  - Administrative remote access tools
+  - IT support remote sessions
+
+level: high
+
+tags:
+  - attack.lateral_movement
+  - attack.t1021
+  - attack.t1021.001
+  - attack.t1021.002
